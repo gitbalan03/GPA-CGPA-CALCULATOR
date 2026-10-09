@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Department – GPA &amp; CGPA Calculator</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <style>
+    :root {
+      --navy: #0a1628;
+      --navy-mid: #112240;
+      --navy-light: #1e3a5f;
+      --accent: #2563eb;
+      --accent-bright: #3b82f6;
+      --accent-glow: #60a5fa;
+      --gold: #f59e0b;
+      --gold-light: #fcd34d;
+      --success: #10b981;
+      --danger: #ef4444;
+      --white: #ffffff;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --card-bg: #ffffff;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, .08), 0 1px 2px rgba(0, 0, 0, .06);
+      --shadow-md: 0 4px 16px rgba(0, 0, 0, .10), 0 2px 6px rgba(0, 0, 0, .06);
+      --shadow-lg: 0 10px 40px rgba(0, 0, 0, .12), 0 4px 12px rgba(0, 0, 0, .08);
+      --shadow-xl: 0 20px 60px rgba(0, 0, 0, .15), 0 8px 20px rgba(0, 0, 0, .10);
+      --radius: 12px;
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--gray-100);
+      color: var(--gray-800);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 50%, var(--navy-light) 100%);
+      color: white;
+      padding: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .header-inner {
+      position: relative;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 28px 24px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .header-logo {
+      width: 60px;
+      height: 60px;
+      flex-shrink: 0;
+      background: linear-gradient(135deg, var(--accent), var(--accent-glow));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 8px 24px rgba(37, 99, 235, .4);
+    }
+
+    .header-text h2 {
+      font-size: clamp(.85rem, 2vw, 1.05rem);
+      font-weight: 700;
+      letter-spacing: .3px;
+      color: var(--gold-light);
+    }
+
+    .header-text h4 {
+      font-size: clamp(.7rem, 1.5vw, .82rem);
+      font-weight: 400;
+      color: rgba(255, 255, 255, .55);
+      margin-top: 2px;
+    }
+
+    .header-text h1 {
+      font-size: clamp(1.1rem, 2.5vw, 1.7rem);
+      font-weight: 800;
+      letter-spacing: -.5px;
+      line-height: 1.2;
+      margin-top: 6px;
+    }
+
+    .header-text p {
+      font-size: .84rem;
+      color: rgba(255, 255, 255, .6);
+      margin-top: 3px;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      margin-left: auto;
+      background: rgba(255, 255, 255, .1);
+      border: 1px solid rgba(255, 255, 255, .15);
+      backdrop-filter: blur(8px);
+      border-radius: 50px;
+      padding: 6px 18px;
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: .5px;
+      white-space: nowrap;
+    }
+
+    /* ── MAIN ── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+      border: 1px solid var(--gray-200);
+      animation: fadeUp .4s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px)
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0)
+      }
+    }
+
+    .card-header {
+      background: linear-gradient(90deg, var(--navy-mid), var(--navy-light));
+      color: white;
+      padding: 13px 22px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: .95rem;
+      letter-spacing: .2px;
+    }
+
+    .card-header .icon {
+      font-size: 1.1rem;
+      opacity: .85;
+    }
+
+    .card-body {
+      padding: 22px;
+    }
+
+    /* ── FORM ── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      font-family: 'Sora', sans-serif;
+      font-size: .9rem;
+      padding: 10px 14px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      background: var(--gray-50);
+      color: var(--gray-800);
+      transition: border-color .2s, box-shadow .2s;
+      outline: none;
+      width: 100%;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    select:focus {
+      border-color: var(--accent-bright);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, .12);
+      background: white;
+    }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid var(--gray-200);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+
+    thead tr {
+      background: linear-gradient(90deg, var(--navy-mid), var(--navy-light));
+      color: white;
+    }
+
+    thead th {
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      font-size: .78rem;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid var(--gray-100);
+      transition: background .15s;
+    }
+
+    tbody tr:hover {
+      background: #f0f6ff;
+    }
+
+    tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    tbody td {
+      padding: 11px 14px;
+      color: var(--gray-700);
+    }
+
+    tbody td:nth-child(2) {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .78rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .grade-select {
+      font-family: 'Sora', sans-serif;
+      font-size: .85rem;
+      padding: 7px 12px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 6px;
+      background: white;
+      color: var(--gray-800);
+      cursor: pointer;
+      min-width: 80px;
+      transition: border-color .2s;
+    }
+
+    .grade-select:focus {
+      border-color: var(--accent-bright);
+      outline: none;
+    }
+
+    /* ── BUTTONS ── */
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .btn {
+      font-family: 'Sora', sans-serif;
+      font-size: .84rem;
+      font-weight: 600;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: .2px;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-bright));
+      color: white;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, .35);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #1d4ed8, var(--accent));
+      box-shadow: 0 6px 20px rgba(37, 99, 235, .45);
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #059669, var(--success));
+      color: white;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, .3);
+    }
+
+    .btn-success:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(16, 185, 129, .4);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #d97706, var(--gold));
+      color: white;
+      box-shadow: 0 4px 14px rgba(245, 158, 11, .3);
+    }
+
+    .btn-gold:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, .4);
+    }
+
+    .btn-navy {
+      background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+      color: white;
+      box-shadow: 0 4px 14px rgba(10, 22, 40, .3);
+    }
+
+    .btn-navy:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(10, 22, 40, .4);
+    }
+
+    .btn-outline {
+      background: white;
+      color: var(--gray-700);
+      border: 1.5px solid var(--gray-200);
+    }
+
+    .btn-outline:hover {
+      background: var(--gray-50);
+      border-color: var(--gray-300);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #dc2626, var(--danger));
+      color: white;
+      box-shadow: 0 4px 14px rgba(239, 68, 68, .3);
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, .4);
+    }
+
+    .btn-purple {
+      background: linear-gradient(135deg, #7c3aed, #9333ea);
+      color: white;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, .35);
+    }
+
+    .btn-purple:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .45);
+    }
+
+    /* ── GPA CHIP ── */
+    #gpaResult {
+      display: none;
+      margin-top: 18px;
+    }
+
+    .gpa-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--navy-mid), var(--navy-light));
+      color: white;
+      padding: 14px 24px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      box-shadow: 0 8px 24px rgba(10, 22, 40, .25);
+      animation: popIn .3s cubic-bezier(.34, 1.56, .64, 1) both;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @keyframes popIn {
+      from {
+        opacity: 0;
+        transform: scale(.85)
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1)
+      }
+    }
+
+    .gpa-chip .gpa-val {
+      font-size: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--gold-light);
+    }
+
+    .gpa-badge {
+      background: rgba(255, 255, 255, .12);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* ── CREDIT BADGE ── */
+    .credit-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--navy-mid);
+      color: var(--accent-glow);
+      width: 30px;
+      height: 30px;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .78rem;
+      font-weight: 700;
+    }
+
+    /* ── SAVED SEMS ── */
+    .saved-sems {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .sem-chip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      border-radius: 50px;
+      padding: 5px 14px;
+      font-size: .78rem;
+      font-weight: 600;
+      border: 1.5px solid #bae6fd;
+    }
+
+    .sem-chip .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px;
+      color: var(--gray-400);
+    }
+
+    .empty-state .icon {
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: .9rem;
+    }
+
+    /* ── REPORT SECTION ── */
+    #reportSection {
+      display: none;
+      animation: fadeUp .4s ease both;
+    }
+
+    .semester-card {
+      border-left: 4px solid var(--accent);
+      background: var(--gray-50);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+    }
+
+    .semester-card h4 {
+      font-size: .85rem;
+      font-weight: 700;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 10px;
+    }
+
+    .summary-table {
+      margin-top: 16px;
+    }
+
+    .summary-table thead tr {
+      background: linear-gradient(90deg, var(--navy), var(--navy-light));
+    }
+
+    .cgpa-banner {
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: white;
+      border-radius: 14px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 20px;
+      box-shadow: var(--shadow-lg);
+    }
+
+    .cgpa-banner .label {
+      font-size: .85rem;
+      color: rgba(255, 255, 255, .65);
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .cgpa-banner .value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      line-height: 1;
+    }
+
+    .cgpa-banner .grade-class {
+      font-size: .9rem;
+      font-weight: 600;
+      color: rgba(255, 255, 255, .8);
+      margin-top: 6px;
+    }
+
+    /* ── CGPA STANDALONE CALCULATOR ── */
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 13px 22px;
+      border-bottom: 1px solid var(--gray-200);
+      background: linear-gradient(90deg, var(--navy-mid), var(--navy-light));
+      color: white;
+    }
+
+    .icon-gold {
+      color: var(--gold-light);
+    }
+
+    .cgpa-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      padding: 20px 22px 0;
+    }
+
+    .cgpa-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field-label {
+      font-size: .75rem;
+      font-weight: 600;
+      color: var(--gray-600);
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+
+    .field-input {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .9rem;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1.5px solid var(--gray-200);
+      background: var(--gray-50);
+      outline: none;
+      transition: .2s;
+      width: 100%;
+    }
+
+    .field-input:focus {
+      border-color: var(--accent);
+      background: white;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+    }
+
+    .result-card {
+      display: none;
+      margin: 20px;
+      padding: 24px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--navy), var(--navy-light));
+      color: white;
+      text-align: center;
+      box-shadow: var(--shadow-lg);
+      animation: fadeUp .4s ease;
+    }
+
+    .result-label {
+      font-size: .8rem;
+      color: rgba(255, 255, 255, .65);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .result-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--gold-light);
+      margin: 6px 0;
+    }
+
+    .result-meta {
+      font-size: .85rem;
+      color: rgba(255, 255, 255, .75);
+    }
+
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, .15);
+      margin: 16px 0;
+    }
+
+    #perfBadge {
+      margin-top: 6px;
+      font-size: .85rem;
+      font-weight: 600;
+    }
+
+    .cgpa-btns {
+      padding: 0 22px 22px;
+    }
+
+    /* ── PLACEHOLDER ── */
+    #subjectPlaceholder {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray-400);
+    }
+
+    #subjectPlaceholder .big {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    #subjectPlaceholder p {
+      font-size: .875rem;
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: var(--navy);
+      color: white;
+      padding: 13px 22px;
+      border-radius: 10px;
+      font-size: .875rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-xl);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: all .3s cubic-bezier(.34, 1.56, .64, 1);
+      z-index: 9999;
+      max-width: 320px;
+      border-left: 4px solid var(--accent-bright);
+    }
+
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    #toast.error {
+      border-left-color: var(--danger);
+    }
+
+    #toast.success {
+      border-left-color: var(--success);
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--gray-100);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--gray-300);
+      border-radius: 99px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 22px 16px;
+      background: var(--navy);
+      color: rgba(255, 255, 255, .5);
+      font-size: .82rem;
+    }
+
+    footer strong {
+      color: var(--gold-light);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width:640px) {
+      .header-badge {
+        margin-left: 0;
+      }
+
+      .btn {
+        font-size: .78rem;
+        padding: 9px 13px;
+      }
+
+      .cgpa-banner .value {
+        font-size: 2.2rem;
+      }
+
+      .result-value {
+        font-size: 2.2rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-inner">
+      <div class="header-logo">🎓</div>
+
+      <div class="header-text">
+        <h1>IT Department — GPA &amp; CGPA Calculator</h1>
+        <h4>Anna University Academic Performance Tracker</h4>
+        <p>
+          Developed & Designed by <strong>BALAN T</strong><br>
+          B.Tech Information Technology Student<br>
+          Adhiparasakthi College of Engineering (APCE)
+        </p>
+      </div>
+
+      <div class="header-badge">APCE IT</div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ── Student Info ── -->
+    <div class="card" style="animation-delay:.05s">
+      <div class="card-header"><span class="icon">👤</span> Student Information</div>
+      <div class="card-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Student Name</label>
+            <input type="text" id="studentName" placeholder="Enter your full name">
+          </div>
+          <div class="form-group">
+            <label>Register Number</label>
+            <input type="text" id="regNumber" placeholder="e.g. 312523104001">
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input type="text" id="deptName" value="Information Technology">
+          </div>
+          <div class="form-group">
+            <label>Select Semester</label>
+            <select id="semSelect" onchange="loadSubjects()">
+              <option value="">— Choose Semester —</option>
+              <option value="1">Semester 1</option>
+              <option value="2">Semester 2</option>
+              <option value="3">Semester 3</option>
+              <option value="4">Semester 4</option>
+              <option value="5">Semester 5</option>
+              <option value="6">Semester 6</option>
+              <option value="7">Semester 7</option>
+              <option value="8">Semester 8</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Subject Grades (GPA Calculator) ── -->
+    <div class="card" style="animation-delay:.10s">
+      <div class="card-header"><span class="icon">📚</span> Semester GPA Calculator</div>
+      <div class="card-body" style="padding:0">
+        <div id="subjectPlaceholder">
+          <div class="big">📋</div>
+          <p>Select a semester above to load subjects and grades</p>
+        </div>
+        <div id="subjectTable" style="display:none">
+          <div class="table-wrap">
+            <table id="gradesTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Subject Code</th>
+                  <th>Subject Title</th>
+                  <th>Credits</th>
+                  <th>Grade</th>
+                  <th>Grade Points</th>
+                </tr>
+              </thead>
+              <tbody id="gradesBody"></tbody>
+            </table>
+          </div>
+          <div style="padding:18px 22px 22px">
+            <div class="btn-row">
+              <button class="btn btn-primary" onclick="calculateGPA()">⚡ Calculate GPA</button>
+              <button class="btn btn-success" onclick="saveSemGPA()">💾 Save Semester GPA</button>
+              <button class="btn btn-outline" onclick="resetGrades()">🔄 Reset Grades</button>
+            </div>
+            <div id="gpaResult">
+              <div class="gpa-chip">
+                <span>Semester <span id="gpaChipSem">—</span> GPA:</span>
+                <span class="gpa-val" id="gpaChipVal">—</span>
+                <span class="gpa-badge" id="gpaChipClass">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Saved Semesters ── -->
+    <div class="card" style="animation-delay:.15s">
+      <div class="card-header"><span class="icon">✅</span> Saved Semesters</div>
+      <div class="card-body">
+        <div id="savedSemsDisplay">
+          <div class="empty-state">
+            <div class="icon">📂</div>
+            <p>No semesters saved yet. Calculate and save a semester GPA first.</p>
+          </div>
+        </div>
+        <div id="savedBtnRow" class="btn-row" style="display:none">
+          <button class="btn btn-navy" onclick="generateReport()">📄 Generate Full Report</button>
+          <button class="btn btn-gold" onclick="downloadPDF()">⬇️ Download PDF</button>
+          <button class="btn btn-outline" onclick="printReport()">🖨️ Print Report</button>
+          <button class="btn btn-danger" onclick="resetData()">🗑️ Reset All Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Full Academic Report ── -->
+    <div id="reportSection" class="card" style="animation-delay:.2s">
+      <div class="card-header"><span class="icon">🏆</span> Full Academic Report</div>
+      <div class="card-body">
+        <div id="reportBody"></div>
+      </div>
+    </div>
+
+    <!-- ── Standalone CGPA Calculator ── -->
+    <div class="card" style="animation-delay:.25s">
+      <div class="card-title">
+        <span class="icon icon-gold">🏆</span>
+        Overall CGPA Calculator
+        <span style="font-size:.75rem;opacity:.6;margin-left:8px;font-weight:400">(Enter GPAs manually if not using the
+          GPA Calculator above)</span>
+      </div>
+      <div class="cgpa-grid">
+        <div class="cgpa-field"><label class="field-label" for="gpa1">Semester 1 GPA</label><input class="field-input"
+            id="gpa1" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa2">Semester 2 GPA</label><input class="field-input"
+            id="gpa2" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa3">Semester 3 GPA</label><input class="field-input"
+            id="gpa3" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa4">Semester 4 GPA</label><input class="field-input"
+            id="gpa4" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa5">Semester 5 GPA</label><input class="field-input"
+            id="gpa5" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa6">Semester 6 GPA</label><input class="field-input"
+            id="gpa6" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa7">Semester 7 GPA</label><input class="field-input"
+            id="gpa7" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+        <div class="cgpa-field"><label class="field-label" for="gpa8">Semester 8 GPA</label><input class="field-input"
+            id="gpa8" type="number" min="0" max="10" step="0.01" placeholder="0.00"></div>
+      </div>
+      <div class="cgpa-btns">
+        <div class="btn-row">
+          <button class="btn btn-purple" onclick="calculateStandaloneCGPA()">🎯 Calculate CGPA</button>
+          <button class="btn btn-outline" onclick="clearCGPAFields()">✕ Clear</button>
+          <button class="btn btn-gold" onclick="downloadCGPAPDF()">⬇️ Download PDF</button>
+        </div>
+      </div>
+      <div class="result-card" id="cgpaResult">
+        <div class="result-label">Overall CGPA</div>
+        <div class="result-value" id="cgpaValue">—</div>
+        <div class="result-meta" id="cgpaMeta"></div>
+        <div id="perfBadge"></div>
+        <div class="divider"></div>
+        <div style="font-size:.8rem;opacity:.6">Based on entered semester GPAs</div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <strong>Smart GPA &amp; CGPA Calculator</strong> &nbsp;·&nbsp; Built for IT Students &nbsp;·&nbsp;
+    <strong>Adhiparasakthi College of Engineering</strong> &nbsp;·&nbsp; Semesters 1–8
+  </footer>
+
+  <div id="toast"></div>
+
+  <!-- ════════════════════ JAVASCRIPT ════════════════════ -->
+  <script>
+    // ─── SUBJECT DATA ────────────────────────────────────────────────────────────
+    const SUBJECTS = {
+      1: [
+        { code: 'BS3171', name: 'Physics and Chemistry Laboratory', credits: 2 },
+        { code: 'CY3151', name: 'Engineering Chemistry', credits: 3 },
+        { code: 'GE3151', name: 'Problem Solving and Python Programming', credits: 3 },
+        { code: 'GE3152', name: 'Heritage of Tamils', credits: 1 },
+        { code: 'GE3171', name: 'Problem Solving and Python Programming Laboratory', credits: 2 },
+        { code: 'GE3172', name: 'English Laboratory', credits: 1 },
+        { code: 'HS3152', name: 'Professional English I', credits: 3 },
+        { code: 'MA3151', name: 'Matrices and Calculus', credits: 4 },
+        { code: 'PH3151', name: 'Engineering Physics', credits: 3 },
+      ],
+      2: [
+        { code: 'GE3272', name: 'Communication Laboratory', credits: 2 },
+        { code: 'BE3251', name: 'Basic Electrical and Electronics Engineering', credits: 3 },
+        { code: 'CS3251', name: 'Programming in C', credits: 3 },
+        { code: 'GE3251', name: 'Engineering Graphics', credits: 4 },
+        { code: 'GE3252', name: 'Tamils and Technology', credits: 1 },
+        { code: 'HS3252', name: 'Professional English II', credits: 2 },
+        { code: 'MA3251', name: 'Statistics and Numerical Methods', credits: 4 },
+        { code: 'PH3256', name: 'Physics for Information Science', credits: 3 },
+        { code: 'CS3271', name: 'Programming in C Laboratory', credits: 2 },
+        { code: 'GE3271', name: 'Engineering Practices Laboratory', credits: 2 },
+      ],
+      3: [
+        { code: 'CS3351', name: 'Digital Principles and Computer Organization', credits: 4 },
+        { code: 'GE3361', name: 'Professional Development', credits: 1 },
+        { code: 'CS3352', name: 'Foundations of Data Science', credits: 3 },
+        { code: 'CD3291', name: 'Data Structures and Algorithms', credits: 3 },
+        { code: 'CS3391', name: 'Object Oriented Programming', credits: 3 },
+        { code: 'MA3354', name: 'Discrete Mathematics', credits: 4 },
+        { code: 'CD3281', name: 'Data Structures and Algorithms Laboratory', credits: 2 },
+        { code: 'CS3361', name: 'Data Science Laboratory', credits: 2 },
+        { code: 'CS3381', name: 'Object Oriented Programming Laboratory', credits: 1.5 },
+      ],
+      4: [
+        { code: 'CS3491', name: 'Artificial Intelligence and Machine Learning', credits: 4 },
+        { code: 'IT3401', name: 'Web Essentials', credits: 4 },
+        { code: 'NM1074', name: 'Employability and Business Professional Laboratory', credits: 2 },
+        { code: 'CS3451', name: 'Introduction to Operating Systems', credits: 3 },
+        { code: 'CS3452', name: 'Theory of Computation', credits: 3 },
+        { code: 'CS3492', name: 'Database Management Systems', credits: 3 },
+        { code: 'GE3451', name: 'Environmental Sciences and Sustainability', credits: 2 },
+        { code: 'CS3461', name: 'Operating Systems Laboratory', credits: 1.5 },
+        { code: 'CS3481', name: 'Database Management Systems Laboratory', credits: 1.5 },
+      ],
+      5: [
+        { code: 'CCS334', name: 'Big Data Analytics', credits: 3 },
+        { code: 'CCS335', name: 'Cloud Computing', credits: 3 },
+        { code: 'CS3591', name: 'Computer Networks', credits: 4 },
+        { code: 'CS3691', name: 'Embedded Systems and Internet of Things', credits: 4 },
+        { code: 'NM1020', name: 'UI/UX Design', credits: 2 },
+        { code: 'MX3084', name: 'Disaster Risk Management', credits: 0 },
+        { code: 'CS3551', name: 'Distributed Computing', credits: 3 },
+        { code: 'IT3501', name: 'Full Stack Web Development', credits: 3 },
+        { code: 'IT3511', name: 'Full Stack Web Development Laboratory', credits: 2 },
+      ],
+      6: [
+        { code: 'CCS356', name: 'Object Oriented Software Engineering', credits: 4 },
+        { code: 'CCS341', name: 'Data Warehousing', credits: 3 },
+        { code: 'CCS352', name: 'Multimedia and Animation', credits: 3 },
+        { code: 'CCS354', name: 'Network Security', credits: 3 },
+        { code: 'CCS365', name: 'Software Defined Networks', credits: 3 },
+        { code: 'SB8015', name: 'Cybersecurity', credits: 2 },
+        { code: 'MX3089', name: 'Industrial Safety', credits: 0 },
+        { code: 'IT3681', name: 'Mobile Applications Development Laboratory', credits: 1.5 },
+      ],
+      7: [
+        { code: 'GE3791', name: 'Human Values and Ethics', credits: 2 },
+        { code: 'GE3751', name: 'Principles of Management', credits: 3 },
+        { code: 'CRA332', name: 'Drone Technology', credits: 3 },
+        { code: 'AI3021', name: 'Information Technology in Agricultural Systems', credits: 3 },
+        { code: 'IT3711', name: 'Summer Internship', credits: 2 }
+      ],
+      8: [
+        { code: 'IT3811', name: 'Project Work / Internship', credits: 10 }
+      ],
+    };
+
+    const GRADE_POINTS = { O: 10, 'A+': 9, A: 8, 'B+': 7, B: 6, C: 5, U: 0 };
+    const GRADES = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U'];
+    const ALL_SEMS = [1, 2, 3, 4, 5, 6, 7, 8];
+
+    let savedResults = {};
+
+    // ─── GRADE CLASS ─────────────────────────────────────────────────────────────
+    function gradeClass(g) {
+      if (g >= 9.5) return 'Outstanding';
+      if (g >= 9.0) return 'First Class with Distinction';
+      if (g >= 8.0) return 'First Class';
+      if (g >= 7.0) return 'Second Class';
+      if (g >= 6.0) return 'Pass Class';
+      if (g >= 5.0) return 'Pass';
+      return 'Fail';
+    }
+
+    // ─── LOAD SUBJECTS ────────────────────────────────────────────────────────────
+    function loadSubjects() {
+      const sem = document.getElementById('semSelect').value;
+      const placeholder = document.getElementById('subjectPlaceholder');
+      const tableWrap = document.getElementById('subjectTable');
+      const body = document.getElementById('gradesBody');
+      document.getElementById('gpaResult').style.display = 'none';
+
+      if (!sem) {
+        placeholder.style.display = 'block';
+        tableWrap.style.display = 'none';
+        return;
+      }
+
+      placeholder.style.display = 'none';
+      tableWrap.style.display = 'block';
+      body.innerHTML = '';
+
+      const subs = SUBJECTS[sem];
+      const saved = savedResults[sem];
+
+      subs.forEach((s, i) => {
+        const savedGrade = saved ? (saved.grades[s.code] || '') : '';
+        const pts = savedGrade ? (s.credits * GRADE_POINTS[savedGrade]).toFixed(1) : '—';
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td style="color:var(--gray-400);font-family:'JetBrains Mono',monospace;font-size:.75rem">${i + 1}</td>
+          <td>${s.code}</td>
+          <td style="font-weight:500">${s.name}</td>
+          <td><span class="credit-badge">${s.credits}</span></td>
+          <td>
+            <select class="grade-select" data-code="${s.code}" data-credits="${s.credits}" onchange="refreshPoints(this)">
+              <option value="">— Select —</option>
+              ${GRADES.map(g => `<option value="${g}"${savedGrade === g ? ' selected' : ''}>${g}</option>`).join('')}
+            </select>
+          </td>
+          <td class="pts-cell" id="pts-${s.code}" style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--accent)">${pts}</td>
+        `;
+        body.appendChild(row);
+      });
+
+      if (saved) {
+        document.getElementById('gpaResult').style.display = 'block';
+        document.getElementById('gpaChipSem').textContent = sem;
+        document.getElementById('gpaChipVal').textContent = saved.gpa.toFixed(2);
+        document.getElementById('gpaChipClass').textContent = gradeClass(saved.gpa);
+      }
+    }
+
+    // ─── REFRESH POINTS CELL ─────────────────────────────────────────────────────
+    function refreshPoints(sel) {
+      const code = sel.dataset.code;
+      const credits = parseFloat(sel.dataset.credits);
+      const grade = sel.value;
+      const cell = document.getElementById('pts-' + code);
+      cell.textContent = grade ? (credits * GRADE_POINTS[grade]).toFixed(1) : '—';
+    }
+
+    // ─── CALCULATE GPA ────────────────────────────────────────────────────────────
+    function calculateGPA() {
+      const sem = document.getElementById('semSelect').value;
+      if (!sem) { toast('Please select a semester first.', 'error'); return; }
+
+      const selects = document.querySelectorAll('.grade-select');
+      let totalPoints = 0, totalCredits = 0, hasEmpty = false;
+
+      selects.forEach(sel => {
+        if (!sel.value) { hasEmpty = true; return; }
+        const credits = parseFloat(sel.dataset.credits);
+        totalPoints += credits * GRADE_POINTS[sel.value];
+        totalCredits += credits;
+      });
+
+      if (hasEmpty) { toast('Please select grades for ALL subjects.', 'error'); return; }
+      if (totalCredits === 0) { toast('Total credits is 0 — cannot calculate GPA.', 'error'); return; }
+
+      const gpa = totalPoints / totalCredits;
+      document.getElementById('gpaResult').style.display = 'block';
+      document.getElementById('gpaChipSem').textContent = sem;
+      document.getElementById('gpaChipVal').textContent = gpa.toFixed(2);
+      document.getElementById('gpaChipClass').textContent = gradeClass(gpa);
+      toast(`Semester ${sem} GPA: ${gpa.toFixed(2)} — ${gradeClass(gpa)}`, 'success');
+    }
+
+    // ─── SAVE SEMESTER GPA ───────────────────────────────────────────────────────
+    function saveSemGPA() {
+      const sem = document.getElementById('semSelect').value;
+      if (!sem) { toast('Please select a semester first.', 'error'); return; }
+
+      const selects = document.querySelectorAll('.grade-select');
+      let totalPoints = 0, totalCredits = 0, hasEmpty = false;
+      const grades = {};
+
+      selects.forEach(sel => {
+        if (!sel.value) { hasEmpty = true; return; }
+        const credits = parseFloat(sel.dataset.credits);
+        grades[sel.dataset.code] = sel.value;
+        totalPoints += credits * GRADE_POINTS[sel.value];
+        totalCredits += credits;
+      });
+
+      if (hasEmpty) { toast('Please select grades for ALL subjects before saving.', 'error'); return; }
+
+      const gpa = totalCredits > 0 ? totalPoints / totalCredits : 0;
+      savedResults[sem] = { gpa, totalPoints, totalCredits, grades };
+      updateSavedDisplay();
+      toast(`Semester ${sem} GPA saved! (${gpa.toFixed(2)})`, 'success');
+    }
+
+    // ─── UPDATE SAVED DISPLAY ────────────────────────────────────────────────────
+    function updateSavedDisplay() {
+      const container = document.getElementById('savedSemsDisplay');
+      const btnRow = document.getElementById('savedBtnRow');
+      const keys = Object.keys(savedResults).sort((a, b) => a - b);
+
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="empty-state"><div class="icon">📂</div><p>No semesters saved yet. Calculate and save a semester GPA first.</p></div>`;
+        btnRow.style.display = 'none';
+        return;
+      }
+
+      container.innerHTML = `<div class="saved-sems">
+        ${keys.map(k => `
+          <div class="sem-chip">
+            <span class="dot"></span>
+            Sem ${k} &nbsp;|&nbsp; GPA: <strong>${savedResults[k].gpa.toFixed(2)}</strong>
+            &nbsp;|&nbsp; ${gradeClass(savedResults[k].gpa)}
+          </div>`).join('')}
+      </div>`;
+      btnRow.style.display = 'flex';
+    }
+
+    // ─── RESET GRADES IN TABLE ───────────────────────────────────────────────────
+    function resetGrades() {
+      document.querySelectorAll('.grade-select').forEach(s => { s.value = ''; });
+      document.querySelectorAll('.pts-cell').forEach(c => { c.textContent = '—'; });
+      document.getElementById('gpaResult').style.display = 'none';
+    }
+
+    // ─── STANDALONE CGPA CALCULATOR ──────────────────────────────────────────────
+    function calculateStandaloneCGPA() {
+      const vals = ALL_SEMS.map(n => {
+        const v = parseFloat(document.getElementById('gpa' + n).value);
+        return isNaN(v) ? null : v;
+      });
+      const validVals = vals.filter(v => v !== null);
+      if (validVals.length === 0) { toast('Enter at least one semester GPA.', 'error'); return; }
+
+      const invalid = validVals.find(v => v < 0 || v > 10);
+      if (invalid !== undefined) { toast('GPA must be between 0.00 and 10.00.', 'error'); return; }
+
+      const cgpa = validVals.reduce((a, b) => a + b, 0) / validVals.length;
+
+      const rc = document.getElementById('cgpaResult');
+      rc.style.display = 'block';
+      document.getElementById('cgpaValue').textContent = cgpa.toFixed(2);
+      document.getElementById('cgpaMeta').textContent = `Based on ${validVals.length} semester(s)`;
+      document.getElementById('perfBadge').textContent = gradeClass(cgpa);
+      toast(`CGPA: ${cgpa.toFixed(2)} — ${gradeClass(cgpa)}`, 'success');
+    }
+
+    function clearCGPAFields() {
+      ALL_SEMS.forEach(n => { document.getElementById('gpa' + n).value = ''; });
+      document.getElementById('cgpaResult').style.display = 'none';
+    }
+
+    // ─── GET CGPA FROM SAVED RESULTS ─────────────────────────────────────────────
+    function getCGPA() {
+      const keys = Object.keys(savedResults);
+      if (keys.length === 0) return { cgpa: 0, count: 0 };
+      const total = keys.reduce((s, k) => s + savedResults[k].gpa, 0);
+      return { cgpa: total / keys.length, count: keys.length };
+    }
+
+    // ─── GENERATE REPORT ─────────────────────────────────────────────────────────
+    function generateReport() {
+      const keys = Object.keys(savedResults).sort((a, b) => a - b);
+      if (keys.length === 0) { toast('No saved semesters found. Save at least one semester first.', 'error'); return; }
+
+      const name = document.getElementById('studentName').value || '—';
+      const reg = document.getElementById('regNumber').value || '—';
+      const dept = document.getElementById('deptName').value || 'Information Technology';
+
+      let html = `
+        <div style="margin-bottom:18px;padding:16px 20px;background:var(--gray-50);border-radius:10px;border:1px solid var(--gray-200)">
+          <div style="font-size:.78rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Student Information</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;font-size:.88rem">
+            <div><strong>Name:</strong> ${name}</div>
+            <div><strong>Register No:</strong> ${reg}</div>
+            <div><strong>Department:</strong> ${dept}</div>
+          </div>
+        </div>`;
+
+      keys.forEach(sem => {
+        const r = savedResults[sem];
+        const subs = SUBJECTS[sem];
+        html += `
+          <div class="semester-card">
+            <h4>📖 Semester ${sem}</h4>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Code</th><th>Subject</th><th>Credits</th><th>Grade</th><th>Pts</th></tr></thead>
+                <tbody>
+                  ${subs.map((s, i) => {
+          const g = r.grades[s.code] || '—';
+          const p = r.grades[s.code] ? (s.credits * GRADE_POINTS[g]).toFixed(1) : '—';
+          return `<tr><td style="color:var(--gray-400)">${i + 1}</td><td>${s.code}</td><td>${s.name}</td><td><span class="credit-badge">${s.credits}</span></td><td><strong>${g}</strong></td><td style="font-family:'JetBrains Mono',monospace;color:var(--accent)">${p}</td></tr>`;
+        }).join('')}
+                </tbody>
+              </table>
+            </div>
+            <div style="margin-top:10px;padding:10px 14px;background:linear-gradient(90deg,var(--navy-mid),var(--navy-light));color:white;border-radius:8px;font-size:.85rem;display:flex;gap:18px;flex-wrap:wrap">
+              <span>GPA: <strong style="color:var(--gold-light)">${r.gpa.toFixed(2)}</strong></span>
+              <span>Credits: <strong>${r.totalCredits}</strong></span>
+              <span>Grade Points: <strong>${r.totalPoints.toFixed(1)}</strong></span>
+              <span>${gradeClass(r.gpa)}</span>
+            </div>
+          </div>`;
+      });
+
+      // Summary Table
+      html += `
+        <div class="summary-table">
+          <div style="font-size:.88rem;font-weight:700;color:var(--navy);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">📊 Academic Summary</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Semester</th><th>Credits</th><th>Grade Points</th><th>GPA</th><th>Class</th></tr></thead>
+              <tbody>
+                ${ALL_SEMS.map(n => {
+        const r = savedResults[n];
+        if (!r) return `<tr><td>Semester ${n}</td><td>—</td><td>—</td><td>—</td><td style="color:var(--gray-400)">Not saved</td></tr>`;
+        return `<tr><td><strong>Semester ${n}</strong></td><td>${r.totalCredits}</td><td>${r.totalPoints.toFixed(1)}</td><td style="font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700">${r.gpa.toFixed(2)}</td><td>${gradeClass(r.gpa)}</td></tr>`;
+      }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>`;
+
+      // CGPA Banner
+      const { cgpa, count } = getCGPA();
+      html += `
+        <div class="cgpa-banner">
+          <div>
+            <div class="label">Overall CGPA (${count} semester${count > 1 ? 's' : ''})</div>
+            <div class="value">${cgpa.toFixed(2)}</div>
+            <div class="grade-class">${gradeClass(cgpa)}</div>
+          </div>
+        </div>`;
+
+      document.getElementById('reportBody').innerHTML = html;
+      const sec = document.getElementById('reportSection');
+      sec.style.display = 'block';
+      setTimeout(() => sec.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+    }
+
+    // ─── DOWNLOAD PDF (from saved results) ──────────────────────────────────────
+    function downloadPDF() {
+      const keys = Object.keys(savedResults).sort((a, b) => a - b);
+      if (keys.length === 0) { toast('No saved data to generate PDF.', 'error'); return; }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+      const PW = doc.internal.pageSize.getWidth();
+      let y = 0;
+
+      const addPage = () => { doc.addPage(); y = 16; };
+      const checkPg = (n) => { if (y + n > 270) addPage(); };
+
+      doc.setFillColor(10, 22, 40);
+      doc.rect(0, 0, PW, 40, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+      doc.text('ADHIPARASAKTHI COLLEGE OF ENGINEERING', PW / 2, 10, { align: 'center' });
+      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(252, 211, 77);
+      doc.text('IT Department — GPA & CGPA Academic Report', PW / 2, 18, { align: 'center' });
+      doc.setTextColor(160, 190, 230);
+      doc.text('Anna University · Information Technology Department', PW / 2, 25, { align: 'center' });
+      doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}`, PW / 2, 32, { align: 'center' });
+      y = 48;
+
+      const name = document.getElementById('studentName').value || '—';
+      const reg = document.getElementById('regNumber').value || '—';
+      const dept = document.getElementById('deptName').value || 'Information Technology';
+      doc.setTextColor(30, 30, 60);
+      doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+      doc.text('Student Information', 14, y); y += 6;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+      doc.text(`Name: ${name}`, 14, y); y += 5;
+      doc.text(`Register Number: ${reg}`, 14, y); y += 5;
+      doc.text(`Department: ${dept}`, 14, y); y += 10;
+
+      keys.forEach(sem => {
+        const r = savedResults[sem];
+        const subs = SUBJECTS[sem];
+        checkPg(20);
+        doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+        doc.setTextColor(10, 22, 40);
+        doc.text(`Semester ${sem}`, 14, y); y += 4;
+
+        doc.autoTable({
+          startY: y,
+          head: [['#', 'Code', 'Subject', 'Credits', 'Grade', 'Pts']],
+          body: subs.map((s, i) => {
+            const g = r.grades[s.code] || '—';
+            const p = r.grades[s.code] ? (s.credits * GRADE_POINTS[g]).toFixed(1) : '—';
+            return [i + 1, s.code, s.name, s.credits, g, p];
+          }),
+          styles: { fontSize: 8, cellPadding: 2.5 },
+          headStyles: { fillColor: [17, 34, 64], textColor: 255, fontSize: 8, fontStyle: 'bold' },
+          alternateRowStyles: { fillColor: [245, 248, 255] },
+          columnStyles: { 0: { cellWidth: 8 }, 1: { cellWidth: 22 }, 2: { cellWidth: 75 }, 3: { cellWidth: 16, halign: 'center' }, 4: { cellWidth: 14, halign: 'center' }, 5: { cellWidth: 16, halign: 'center' } },
+          margin: { left: 14, right: 14 },
+        });
+        y = doc.lastAutoTable.finalY + 3;
+        doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+        doc.setTextColor(37, 99, 235);
+        doc.text(`GPA: ${r.gpa.toFixed(2)}  |  Credits: ${r.totalCredits}  |  Grade Points: ${r.totalPoints.toFixed(1)}  |  ${gradeClass(r.gpa)}`, 14, y);
+        y += 9;
+      });
+
+      checkPg(40);
+      doc.setFontSize(11); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(10, 22, 40);
+      doc.text('Academic Summary', 14, y); y += 4;
+
+      doc.autoTable({
+        startY: y,
+        head: [['Semester', 'Credits', 'Grade Points', 'GPA', 'Class']],
+        body: ALL_SEMS.map(n => {
+          const r = savedResults[n];
+          if (!r) return [`Semester ${n}`, '—', '—', '—', 'Not saved'];
+          return [`Semester ${n}`, r.totalCredits, r.totalPoints.toFixed(1), r.gpa.toFixed(2), gradeClass(r.gpa)];
+        }),
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [10, 22, 40], textColor: 255, fontSize: 9, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+        margin: { left: 14, right: 14 },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      checkPg(28);
+      const { cgpa } = getCGPA();
+      doc.setFillColor(10, 22, 40);
+      doc.roundedRect(14, y, PW - 28, 26, 4, 4, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text('Overall CGPA (Anna University)', 20, y + 8);
+      doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(252, 211, 77);
+      doc.text(cgpa.toFixed(2), 20, y + 20);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(200, 220, 255);
+      doc.text(gradeClass(cgpa), 58, y + 20);
+      doc.setFontSize(8); doc.setTextColor(130, 160, 200);
+      doc.text(`${dept}  ·  ${new Date().toLocaleDateString('en-IN')}`, PW - 14, y + 20, { align: 'right' });
+
+      doc.save(`GPA_Report_${reg}.pdf`);
+      toast('PDF downloaded successfully!', 'success');
+    }
+
+    // ─── DOWNLOAD CGPA PDF (standalone) ─────────────────────────────────────────
+    function downloadCGPAPDF() {
+      const vals = ALL_SEMS.map(n => {
+        const v = parseFloat(document.getElementById('gpa' + n).value);
+        return isNaN(v) ? null : v;
+      });
+      const validVals = vals.filter(v => v !== null);
+      if (validVals.length === 0) { toast('Enter at least one GPA before downloading.', 'error'); return; }
+
+      const cgpa = validVals.reduce((a, b) => a + b, 0) / validVals.length;
+      const name = document.getElementById('studentName').value || '—';
+      const reg = document.getElementById('regNumber').value || '—';
+      const dept = document.getElementById('deptName').value || 'Information Technology';
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+      const PW = doc.internal.pageSize.getWidth();
+
+      doc.setFillColor(10, 22, 40); doc.rect(0, 0, PW, 40, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(13); doc.setFont('helvetica', 'bold');
+      doc.text('ADHIPARASAKTHI COLLEGE OF ENGINEERING', PW / 2, 10, { align: 'center' });
+      doc.setFontSize(9); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(252, 211, 77);
+      doc.text('IT Department — CGPA Result Report', PW / 2, 18, { align: 'center' });
+      doc.setTextColor(160, 190, 230);
+      doc.text('Anna University · Information Technology', PW / 2, 25, { align: 'center' });
+      doc.text(`Generated: ${new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })}`, PW / 2, 32, { align: 'center' });
+
+      let y = 48;
+      doc.setTextColor(30, 30, 60);
+      doc.setFontSize(10); doc.setFont('helvetica', 'bold');
+      doc.text('Student Information', 14, y); y += 6;
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(9.5);
+      doc.text(`Name: ${name}`, 14, y); y += 5;
+      doc.text(`Register Number: ${reg}`, 14, y); y += 5;
+      doc.text(`Department: ${dept}`, 14, y); y += 10;
+
+      doc.setFontSize(10); doc.setFont('helvetica', 'bold'); doc.setTextColor(10, 22, 40);
+      doc.text('Semester GPA Details', 14, y); y += 4;
+
+      const tableBody = vals.map((v, i) => [`Semester ${i + 1}`, v !== null ? v.toFixed(2) : 'Not entered', v !== null ? gradeClass(v) : '—']);
+      doc.autoTable({
+        startY: y,
+        head: [['Semester', 'GPA', 'Class']],
+        body: tableBody,
+        styles: { fontSize: 9, cellPadding: 3 },
+        headStyles: { fillColor: [17, 34, 64], textColor: 255, fontStyle: 'bold' },
+        alternateRowStyles: { fillColor: [245, 248, 255] },
+        margin: { left: 14, right: 14 },
+      });
+      y = doc.lastAutoTable.finalY + 10;
+
+      doc.setFillColor(10, 22, 40);
+      doc.roundedRect(14, y, PW - 28, 26, 4, 4, 'F');
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.text(`Overall CGPA (based on ${validVals.length} semester(s))`, 20, y + 8);
+      doc.setFontSize(20); doc.setFont('helvetica', 'bold');
+      doc.setTextColor(252, 211, 77);
+      doc.text(cgpa.toFixed(2), 20, y + 20);
+      doc.setFontSize(10); doc.setFont('helvetica', 'normal');
+      doc.setTextColor(200, 220, 255);
+      doc.text(gradeClass(cgpa), 58, y + 20);
+      doc.setFontSize(8); doc.setTextColor(130, 160, 200);
+      doc.text(`${dept}  ·  ${new Date().toLocaleDateString('en-IN')}`, PW - 14, y + 20, { align: 'right' });
+
+      doc.save(`CGPA_Report_${reg}.pdf`);
+      toast('CGPA PDF downloaded!', 'success');
+    }
+
+    // ─── PRINT REPORT ────────────────────────────────────────────────────────────
+    function printReport() {
+      generateReport();
+      setTimeout(() => window.print(), 600);
+    }
+
+    // ─── RESET ALL DATA ──────────────────────────────────────────────────────────
+    function resetData() {
+      if (!confirm('Reset ALL saved data? This cannot be undone.')) return;
+      savedResults = {};
+      document.getElementById('studentName').value = '';
+      document.getElementById('regNumber').value = '';
+      document.getElementById('semSelect').value = '';
+      document.getElementById('subjectPlaceholder').style.display = 'block';
+      document.getElementById('subjectTable').style.display = 'none';
+      document.getElementById('gpaResult').style.display = 'none';
+      document.getElementById('reportSection').style.display = 'none';
+      updateSavedDisplay();
+      toast('All data has been reset.', 'error');
+    }
+
+    // ─── TOAST ───────────────────────────────────────────────────────────────────
+    let toastTimer;
+    function toast(msg, type = '') {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.className = 'show ' + type;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { el.className = ''; }, 3200);
+    }
+  </script>
+</body>
+
+</html>
